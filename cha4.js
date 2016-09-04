@@ -107,8 +107,47 @@ function element (arr, gen) {
 
 var ele = element(['a', 'b', 'c', 'd'])
 
-console.log(ele());
-console.log(ele());
-console.log(ele());
-console.log(ele());
-console.log(ele());
+function collect (gen, arr){
+  return function (){
+    var value = gen()
+    if (value !== undefined) {
+      arr.push(value)
+    }
+    return value
+  }
+}
+
+var arr = []
+var col = collect(fromTo(0,2), arr)
+
+function filter (gen, predicate) {
+  return function () {
+    var value
+    do { value = gen()
+    } while (value !== undefined && !predicate(value))
+      return value
+  }
+}
+
+var fil = filter(fromTo(0, 5), function third(value) {return value % 3 === 0})
+
+function concat (gen1, gen2) {
+  var gen = gen1
+  return function () {
+    var value = gen()
+    if (value !== undefined) {
+      return value
+    }
+    gen = gen2
+    return gen()
+  }
+}
+
+var con = concat(fromTo(0,3), fromTo(0,2))
+
+console.log(con());
+console.log(con());
+console.log(con());
+console.log(con());
+console.log(con());
+console.log(con());
