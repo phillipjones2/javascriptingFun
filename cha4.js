@@ -145,9 +145,96 @@ function concat (gen1, gen2) {
 
 var con = concat(fromTo(0,3), fromTo(0,2))
 
-console.log(con());
-console.log(con());
-console.log(con());
-console.log(con());
-console.log(con());
-console.log(con());
+function gensymf (prefix) {
+  var number = 0
+  return function () {
+    number += 1
+    return prefix + number
+  }
+}
+
+var geng = gensymf("G")
+var genh = gensymf("H")
+
+function fibonaccif(a, b){
+  var i = 0
+  return function () {
+    var next
+    switch (i) {
+      case 0:
+        i = 1
+        return a
+      case 1:
+        i = 2
+        return b
+      default:
+         next = a + b
+         a = b
+         b = next
+         return next
+    }
+  }
+}
+
+function fibonaccif2(a, b) {
+  return function () {
+    var next = a;
+    a = b
+    b += next
+    return next
+
+  }
+}
+
+var fib = fibonaccif2(0,1)
+
+function counter (value) {
+  return {
+    up: function () {
+      value += 1
+      return value
+    },
+    down: function () {
+      value -= 1
+      return value
+    }
+  }
+}
+
+var counting = counter(1)
+
+function revocable(binary) {
+  var active = true
+  return {
+    invoke: function (a, b){
+      if (active) {
+        return binary(a, b)
+      }
+      return undefined
+    },
+    revoke: function () {
+      active = false
+      return "binary has been revoked"
+    }
+  }
+}
+
+var rev = revocable(add)
+var add_rev = rev.invoke
+
+function m(value, source) {
+  return {
+    value: value,
+    source: (typeof source === 'string') ? source : String(value)
+  }
+}
+
+function addm (obj1, obj2) {
+  return m(
+    obj1.value + obj2.value,
+    '(' + obj1.source + ' + ' + obj2.source + ')'
+  )
+}
+
+console.log(JSON.stringify(addm(m(1), m(2))));
+console.log(JSON.stringify(addm(m(1), m(Math.PI, "pi"))));
